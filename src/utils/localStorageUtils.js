@@ -10,9 +10,4 @@ export const removeFavorite = (packageName) => {
   localStorage.setItem('favorites', JSON.stringify(favorites));
 };
 
-export const updateFavorite = (packageName, newReason) => {
-  const favorites = getFavorites().map((fav) =>
-    fav.packageName === packageName ? { ...fav, reason: newReason } : fav
-  );
-  localStorage.setItem('favorites', JSON.stringify(favorites));
-};
+
