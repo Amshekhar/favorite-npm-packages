@@ -8,12 +8,14 @@ const Favorites = () => {
   const [favorites, setFavorites] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [deletePackage, setDeletePackage] = useState('');
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
+  // Fetch favorites from localStorage 
   useEffect(() => {
     setFavorites(getFavorites());
   }, []);
 
+  // Handle deletion of a favorite package
   const handleDelete = () => {
     removeFavorite(deletePackage);
     setFavorites(getFavorites());
@@ -24,7 +26,7 @@ const Favorites = () => {
     <div className="p-4">
       <h1 className="text-2xl mb-4">NPM Favorite Packages</h1>
 
-      {/* Add Favorite Button */}
+      {/* Button to navigate to Add Favorite page */}
       <div className="mb-4 flex justify-end">
         <button
           className="flex items-center bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
@@ -35,10 +37,12 @@ const Favorites = () => {
         </button>
       </div>
 
+      {/* Display message if no favorites exist */}
       {favorites.length === 0 && (
         <p className="text-gray-500">No favorites added yet. Add some!</p>
       )}
 
+      {/* Render list of favorite packages */}
       {favorites.map((fav) => (
         <div
           key={fav.packageName}
@@ -49,7 +53,7 @@ const Favorites = () => {
             <p className="text-gray-700">{fav.reason}</p>
           </div>
 
-          {/* Action Buttons */}
+          {/* Action buttons for View, Edit, and Delete */}
           <div className="flex items-center space-x-2">
             <button
               className="p-2 text-blue-500 hover:text-blue-600"
@@ -76,7 +80,7 @@ const Favorites = () => {
         </div>
       ))}
 
-      {/* Delete Confirmation Modal */}
+      {/* Modal for delete confirmation */}
       <Modal
         isOpen={showModal}
         title="Confirm Deletion"
