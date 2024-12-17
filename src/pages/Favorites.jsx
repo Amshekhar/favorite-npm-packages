@@ -1,16 +1,26 @@
-import React, { useState, useEffect } from 'react';
-import { FaTrash, FaEdit, FaEye, FaPlus } from 'react-icons/fa'; 
-import Modal from '../components/Modal';
-import { getFavorites, removeFavorite } from '../utils/localStorageUtils';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { FaTrash, FaEdit, FaEye, FaPlus } from "react-icons/fa";
+import Modal from "../components/Modal";
+import {
+  getFavorites,
+  removeFavorite,
+  updateFavorite,
+} from "../utils/localStorageUtils";
+import { useNavigate } from "react-router-dom";
 
 const Favorites = () => {
   const [favorites, setFavorites] = useState([]);
-  const [showModal, setShowModal] = useState(false);
-  const [deletePackage, setDeletePackage] = useState('');
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [deletePackage, setDeletePackage] = useState("");
+  const [editPackage, setEditPackage] = useState({ packageName: "", reason: "" });
+  const [viewPackage, setViewPackage] = useState({ packageName: "", reason: "" });
+  const [newReason, setNewReason] = useState("");
+
   const navigate = useNavigate();
 
-  // Fetch favorites from localStorage 
+  // Fetch favorites from localStorage
   useEffect(() => {
     setFavorites(getFavorites());
   }, []);
@@ -19,7 +29,14 @@ const Favorites = () => {
   const handleDelete = () => {
     removeFavorite(deletePackage);
     setFavorites(getFavorites());
-    setShowModal(false);
+    setShowDeleteModal(false);
+  };
+
+  // Handle editing of a favorite package
+  const handleEdit = () => {
+    updateFavorite(editPackage.packageName, newReason);
+    setFavorites(getFavorites());
+    setShowEditModal(false);
   };
 
   return (
@@ -30,7 +47,7 @@ const Favorites = () => {
       <div className="mb-4 flex justify-end">
         <button
           className="flex items-center bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-          onClick={() => navigate('/')}
+          onClick={() => navigate("/")}
         >
           <FaPlus className="mr-2" />
           Add Favorite
@@ -57,13 +74,20 @@ const Favorites = () => {
           <div className="flex items-center space-x-2">
             <button
               className="p-2 text-blue-500 hover:text-blue-600"
-              onClick={() => alert(`Viewing details of ${fav.packageName}`)}
+              onClick={() => {
+                setViewPackage(fav);
+                setShowViewModal(true);
+              }}
             >
               <FaEye size={20} />
             </button>
             <button
               className="p-2 text-green-500 hover:text-green-600"
-              onClick={() => alert(`Editing ${fav.packageName}`)}
+              onClick={() => {
+                setEditPackage(fav);
+                setNewReason(fav.reason);
+                setShowEditModal(true);
+              }}
             >
               <FaEdit size={20} />
             </button>
@@ -71,7 +95,7 @@ const Favorites = () => {
               className="p-2 text-red-500 hover:text-red-600"
               onClick={() => {
                 setDeletePackage(fav.packageName);
-                setShowModal(true);
+                setShowDeleteModal(true);
               }}
             >
               <FaTrash size={20} />
@@ -80,17 +104,17 @@ const Favorites = () => {
         </div>
       ))}
 
-      {/* Modal for delete confirmation */}
+      {/* Delete Confirmation Modal */}
       <Modal
-        isOpen={showModal}
+        isOpen={showDeleteModal}
         title="Confirm Deletion"
-        onClose={() => setShowModal(false)}
+        onClose={() => setShowDeleteModal(false)}
       >
         <p>Are you sure you want to delete this favorite?</p>
         <div className="flex justify-end mt-4">
           <button
             className="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400 mr-2"
-            onClick={() => setShowModal(false)}
+            onClick={() => setShowDeleteModal(false)}
           >
             Cancel
           </button>
@@ -99,6 +123,51 @@ const Favorites = () => {
             onClick={handleDelete}
           >
             Yes, Delete
+          </button>
+        </div>
+      </Modal>
+
+      {/* View Reason Modal */}
+      <Modal
+        isOpen={showViewModal}
+        title={`Details for ${viewPackage.packageName}`}
+        onClose={() => setShowViewModal(false)}
+      >
+        <p className="text-gray-700">{viewPackage.reason}</p>
+        <div className="flex justify-end mt-4">
+          <button
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            onClick={() => setShowViewModal(false)}
+          >
+            Close
+          </button>
+        </div>
+      </Modal>
+
+      {/* Edit Modal */}
+      <Modal
+        isOpen={showEditModal}
+        title={`Edit Reason for ${editPackage.packageName}`}
+        onClose={() => setShowEditModal(false)}
+      >
+        <textarea
+          value={newReason}
+          onChange={(e) => setNewReason(e.target.value)}
+          className="w-full p-2 mt-2 border rounded"
+          rows="4"
+        />
+        <div className="flex justify-end mt-4">
+          <button
+            className="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400 mr-2"
+            onClick={() => setShowEditModal(false)}
+          >
+            Cancel
+          </button>
+          <button
+            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+            onClick={handleEdit}
+          >
+            Save Changes
           </button>
         </div>
       </Modal>
